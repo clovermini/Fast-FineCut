@@ -113,7 +113,7 @@ finLength  去除毛刺阈值,默认为8
 boundingLength  默认16，边界区域大小
 infiniteCost   默认100，指无穷大
 '''
-def segment(sizeX, sizeY, lastLabeled, nextOriginal, nextSegment, boxLength = 18, boundingLength = 18, KCost = 3):
+def segment(sizeX, sizeY, lastLabeled, nextOriginal, nextSegment, algorithm = "ffc", boxLength = 18, boundingLength = 18, KCost = 3):
     """
     功能：Fast-FineCut边界提取算法主函数，包含图像裁剪、传播分割、拼接一系列操作
         输入：sizeX  裁剪图片宽，推荐值200
@@ -121,6 +121,7 @@ def segment(sizeX, sizeY, lastLabeled, nextOriginal, nextSegment, boxLength = 18
              lastLabeled  上一层已分割图像地址
              nextOriginal  本层原始图像地址
              nextSegment  本层分割结果保存地址
+             algorithm  算法类别 Fast-FineCut -- "ffc"  Waggoner -- "wag"
              boxLength  重叠区域，默认与BoundingLength相同
              boundingLength 边界区域长度，默认18
              infiniteCost   默认100，指无穷大
@@ -139,10 +140,11 @@ def segment(sizeX, sizeY, lastLabeled, nextOriginal, nextSegment, boxLength = 18
         [tmpX, tmpY] = getXAndY(img_tailor)
         for i in range(tmpX+1):
             for j in range(tmpY+1):
+                print("segment >>> ", i, "---", j)
                 lastSegmentImageAddress = os.path.join(img_tailor, "last"+str(i)+"-"+str(j)+'.tif')
                 nextOriginalImageAddress = os.path.join(img_tailor, "next"+str(i)+"-"+str(j)+'.tif')
                 nextSegmentAddress = os.path.join(img_tailor, "result"+str(i)+"-"+str(j)+'.tif')
-                propagationSegment(lastSegmentImageAddress, nextOriginalImageAddress, nextSegmentAddress, boundingLength=boundingLength, KCost=KCost)
+                propagationSegment(lastSegmentImageAddress, nextOriginalImageAddress, nextSegmentAddress, algorithm = algorithm, boundingLength=boundingLength, KCost=KCost)
         result = stitch(sizeX, sizeY, img_tailor, nextSegment, boxLength)
         return result
     else:

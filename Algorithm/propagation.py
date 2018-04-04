@@ -12,12 +12,13 @@ from skimage import morphology
 from skimage.measure import label
 from pygco import cut_from_graph
 
-def propagationSegment(lastSegmentImageAddress, nextOriginalImageAddress, nextSegmentAddress, boundingLength = 18, infiniteCost = 100, KCost = 3):
+def propagationSegment(lastSegmentImageAddress, nextOriginalImageAddress, nextSegmentAddress, algorithm = "ffc", boundingLength = 18, infiniteCost = 100, KCost = 3):
   """
   传播分割主函数
   :param lastSegmentImageAddress: 上一层图片的分割结果存放地址
   :param nextOriginalImageAddress: 本层待分割图片的原图地址
   :param nextSegmentAddress: 本层图片分割结果存放地址
+  :param algorithm: 算法类别 Fast-FineCut -- "ffc"  Waggoner -- "wag"
   :param boundingLength: 边界区域长度
   :param infiniteCost: 无穷大权值的设定值，默认为100
   :param KCost: 二元项中K值设定
@@ -75,10 +76,12 @@ def propagationSegment(lastSegmentImageAddress, nextOriginalImageAddress, nextSe
   imgThreshMean = denoiseByArea(imgThreshMean, 300, neighbors=8)
   tempNextEdge = morphology.skeletonize(imgThreshMean / 255) * 255
 
-  # Fast-FineCut二元项，使用 edgeImage
-  binaryCostMatrix = getBinaryCostFromUnary(nextOriginal, lastSegment, lastLabeled, lastNumber, unaryCostMatrix, type="edgeImage", edgeOriginalImage=tempNextEdge, infiniteCost=infiniteCost, KCost=KCost)
-  # waggoner二元项
-  # binaryCostMatrix = getBinaryCostByWaggoner(nextOriginal, lastSegment, lastLabeled, type="edgeImage", edgeOriginalImage=tempNextEdge, infiniteCost=infiniteCost)
+  if algorithm == "ffc":
+    # Fast-FineCut二元项，使用 edgeImage
+    binaryCostMatrix = getBinaryCostFromUnary(nextOriginal, lastSegment, lastLabeled, lastNumber, unaryCostMatrix, type="edgeImage", edgeOriginalImage=tempNextEdge, infiniteCost=infiniteCost, KCost=KCost)
+  elif algorithm == "wag":
+    # waggoner二元项
+    binaryCostMatrix = getBinaryCostByWaggoner(nextOriginal, lastSegment, lastLabeled, type="edgeImage", edgeOriginalImage=tempNextEdge, infiniteCost=infiniteCost)
 
   # 计算 pairWiseMatrix
   pairWiseMatrix = getPairWiseMatrix(lastSegment, lastLabeled)

@@ -316,16 +316,6 @@ def getEdgesFromLabel(labeled, neighbors=4):
             if isEdges == True:
                 edges[row, col] = 255
 
-    # for i in range(edges.shape[0]):
-    #   for j in range(edges.shape[1]):
-    #     edges[i, j] = 255 - edges[i, j]
-    #
-    # iEdges = Xihua(edges, array)
-    #
-    # for i in range(iEdges.shape[0]):
-    #   for j in range(iEdges.shape[1]):
-    #     iEdges[i, j] = 255 - iEdges[i, j]
-
     return edges
 
 def joinInEqualTabel(value1, value2, equalTable):
