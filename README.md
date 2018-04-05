@@ -8,7 +8,7 @@ To run this algorithm, you need to install the python packages as follows:
     opencv 3
     gco(gco_python-master, gco_v3.0)
 
-To install gco, you need to download the `gco_python-master` and `gco_v3.0` at here first, after download, enter the  `gco_python-master` directory, open the setup file and change the gco_directory to your `gco_v3.0` directory, and then, run the command:
+To install gco, you need to download the `gco_python-master` and `gco_v3.0` at [here](https://github.com/clovermini/Fast-FineCut/releases/tag/v1.0) first, after download, enter the  `gco_python-master` directory, open the setup file and change the gco_directory to your `gco_v3.0` directory, and then, run the command:
 
     python setup.py install
 
