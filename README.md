@@ -1,10 +1,20 @@
 # Fast-FineCut
-This is an implementation of Fast-FineCut algorithm in Python 3, which is a boundary detection algorithm in microscopic images considering 3D information.
+## Citation
+This is an implementation of Fast-FineCut algorithm in Python 3, which is a boundary detection algorithm in microscopic images considering 3D information. 
 
-# Requirements
+If you use it successfully for your research please be so kind to cite our work:
+
+Ma B, Ban X, Su Y, Liu C, Wang H, Xue W. "Fast-FineCut : Boundary detection in microscopic images considering 3D information", Still in Submission...
+
+## Introduction
+The inner structure of a material is called microstructure. It stores the genesis of a material and determines all its physical and chemical properties. However, it is still a big challenge to detect key information in microscopic images fastly
+and accuratly. In this work, we address the task of grain boundary detection in microscopic image processing and develop a graph-cut based method called Fast-FineCut to solve the problem. Our algorithm makes two key contributions: 1) an improved approach that incorporates 3D information between slices as domain knowledge, which can detect the boundaries precisely, even for the vague and missing boundaries. 2) a local processing method based on overlap-tile strategy, which can not only solve the "chain scission" problem at the edge of images, but save the consumption of resources (such as computational time and memory space), making it possible to analyze the microscopic images with huge resolution.
+
+
+## Requirements
 Python 3 need to be installed before running this scripts.
 To run this algorithm, you need to install the python packages as follows:
-  
+
     opencv 3
     gco(gco_python-master, gco-v3.0)
 
@@ -12,11 +22,10 @@ To install gco, you need to download the `gco_python-master` and `gco-v3.0` at [
 
     python setup.py install
 
-# DataSet and Running
+## DataSet and Running
 We provide 11 test microscopic images in the folder `images`, including the `Original`, `GroundTruth` and `Results`, the `Results` includes the detection result of Fast-FineCut algorithm, Wagonner's algorithm and Others. 
 
 If you want to run the Fast-FineCut algorithm and Waggoner's algorithm, run the `fastFineCutDemo.py`, if you want to run the other algorithm, including `Otsu`, `Iteractive`, `Canny` and `Adaptive Threshold`, run the `edgeExtractAllDemo.py`, and if you want to run this on your own datasets, you have to change the corresponding image address in those files.
 
 The example results of Fast-FineCut algorithm is shown as follows: 
-
-![](https://raw.githubusercontent.com/clovermini/MarkdownPhotos/master/004.png)
+![Fast-Fine Cut Result](https://raw.githubusercontent.com/clovermini/MarkdownPhotos/master/004.png)
