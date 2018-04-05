@@ -15,7 +15,7 @@ To install gco, you need to download the `gco_python-master` and `gco-v3.0` at [
 # DataSet and Running
 We provide 11 test microscopic images in the folder `images`, including the `Original`, `GroundTruth` and `Results`, the `Results` includes the detection result of Fast-FineCut algorithm, Wagonner's algorithm and Others. 
 
-If you want to run the Fast-FineCut algorithm and Waggoner's algorithm, run the `fastFineCutDemo.py`, if you want to run the other algorithm, including `Otsu`, `Iteractive`, `Canny` and `Adaptive Threshold`, run the `edgeExtractAllDemo.py`, and if you want to run this on your own datasets, you have to change the corresponding image address in those file.
+If you want to run the Fast-FineCut algorithm and Waggoner's algorithm, run the `fastFineCutDemo.py`, if you want to run the other algorithm, including `Otsu`, `Iteractive`, `Canny` and `Adaptive Threshold`, run the `edgeExtractAllDemo.py`, and if you want to run this on your own datasets, you have to change the corresponding image address in those files.
 
 The example results of Fast-FineCut algorithm is shown as follows: 
 
