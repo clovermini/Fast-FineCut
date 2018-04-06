@@ -30,5 +30,5 @@ If you want to run the Fast-FineCut algorithm and Waggoner's algorithm, run the 
 The example results of Fast-FineCut algorithm is shown as follows: 
 
 <p align = "center">
-<img src="https://github.com/clovermini/MarkdownPhotos/raw/master/004.png">
+<img src="https://raw.githubusercontent.com/clovermini/MarkdownPhotos/master/005.png">
 </p>
