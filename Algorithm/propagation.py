@@ -1,5 +1,4 @@
 #  -*- coding:utf-8 -*-  
-# 功能：本工程的主函数
 import numpy as np
 import cv2 as cv
 from .unaryCost import getUnaryCost
@@ -14,38 +13,38 @@ from pygco import cut_from_graph
 
 def propagationSegment(lastSegmentImageAddress, nextOriginalImageAddress, nextSegmentAddress, algorithm = "ffc", boundingLength = 18, infiniteCost = 100, KCost = 3):
   """
-  传播分割主函数
-  :param lastSegmentImageAddress: 上一层图片的分割结果存放地址
-  :param nextOriginalImageAddress: 本层待分割图片的原图地址
-  :param nextSegmentAddress: 本层图片分割结果存放地址
-  :param algorithm: 算法类别 Fast-FineCut -- "ffc"  Waggoner -- "wag"
-  :param boundingLength: 边界区域长度
-  :param infiniteCost: 无穷大权值的设定值，默认为100
-  :param KCost: 二元项中K值设定
-  :return: 返回分割结果
+  the main function of propagation segmentation
+  :param lastSegmentImageAddress: The address of the segment result of last image
+  :param nextOriginalImageAddress: The address of the original image to be segmented in this layer
+  :param nextSegmentAddress: The storage address of segmentation results
+  :param algorithm: Algorithm category Fast-FineCut -- "ffc"  Waggoner -- "wag"
+  :param boundingLength: the length of bounding region, default 18
+  :param infiniteCost:  Default 100, refers to infinity
+  :param KCost: K value of binary term, default 3
+  :return: Return the segmentation result
   """
 
-  # 读取图像
+  # read the image
   tempLastSegment = cv.imread(lastSegmentImageAddress)
   if tempLastSegment is None:
-      return "上一层图像路径错误"
+      return "The last image's path is wrong"
 
   tempNextOriginal = cv.imread(nextOriginalImageAddress)
   if tempNextOriginal is None:
-      return "本层图像路径错误"
+      return "The path of this layer's image is wrong"
 
-  # 获取图像横纵坐标的数目，获取二维矩阵的第一维和第二为的长度
+  # Gets the number of horizontal and vertical coordinates of the image
   rowNumber = tempLastSegment.shape[0]
   colNumber = tempLastSegment.shape[1]
 
-  # 对上一层已分割图像判断，若为彩色转成灰度图像，若为灰度则不变
+  # Convert the last image to a grayscale image if it is a color image
   lastSegment = np.zeros((rowNumber, colNumber))
   if tempLastSegment.ndim == 3:
       lastSegment = cv.cvtColor(tempLastSegment, cv.COLOR_BGR2GRAY)
   elif tempLastSegment.ndim == 2:
       lastSegment = tempLastSegment
 
-  # 对本层待分割图像判断，若为彩色转成灰度图像，若为灰度则不变
+  # Convert this layered image to a grayscale image if it is a color image
   nextOriginal = np.zeros((rowNumber, colNumber))
   if tempNextOriginal.ndim == 3:
       nextOriginal = cv.cvtColor(tempNextOriginal, cv.COLOR_BGR2GRAY)
@@ -53,45 +52,45 @@ def propagationSegment(lastSegmentImageAddress, nextOriginalImageAddress, nextSe
       nextOriginal = tempNextOriginal
 
   if nextOriginal.shape != lastSegment.shape:
-      return "上一层图像和本层图像维度不一样，错误"
+      return "Error! The image of the previous layer and the image of the layer is different in dimension."
 
 
-  # 对上一层图像进行标记
+  # Label the last image
   uniqueNum = np.unique(lastSegment)
   lastNumber = 0
   lastLabeled = np.zeros((rowNumber, colNumber))
-  if len(uniqueNum) == 2:    # 二值图像
+  if len(uniqueNum) == 2:    # Binary image
       (lastLabeled, lastNumber) = label(lastSegment, background=255, neighbors=4, return_num=True)
       lastLabeled = reviseLabel(lastLabeled)
   elif len(uniqueNum) > 2:
       (lastLabeled, lastNumber) = label(lastSegment, neighbors=4, return_num=True)
   lastLabeled = lastLabeled.astype(np.int32)
 
-  # 计算一元项 unaryCostMatrix 区域项
+  # Calculate the unary item unaryCostMatrix and bounding region
   unaryCostMatrix, boundingRegion = getUnaryCost(lastLabeled, lastSegment, return_boundingRegion=True, morphKernelNum=boundingLength, infiniteCost=infiniteCost)
 
-  # 计算二元项所需的 edgeImage
+  # Calculate the edgeImage required for the binary item
   blurredGaussian = cv.GaussianBlur(nextOriginal, (3, 3), 0)         # 高斯滤波
   imgThreshMean = cv.adaptiveThreshold(blurredGaussian, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 5, 4)
   imgThreshMean = denoiseByArea(imgThreshMean, 300, neighbors=8)
   tempNextEdge = morphology.skeletonize(imgThreshMean / 255) * 255
 
   if algorithm == "ffc":
-    # Fast-FineCut二元项，使用 edgeImage
+    # Fast-FineCut's binary term, use edgeImage
     binaryCostMatrix = getBinaryCostFromUnary(nextOriginal, lastSegment, lastLabeled, lastNumber, unaryCostMatrix, type="edgeImage", edgeOriginalImage=tempNextEdge, infiniteCost=infiniteCost, KCost=KCost)
   elif algorithm == "wag":
-    # waggoner二元项
+    # waggoner's binary term
     binaryCostMatrix = getBinaryCostByWaggoner(nextOriginal, lastSegment, lastLabeled, type="edgeImage", edgeOriginalImage=tempNextEdge, infiniteCost=infiniteCost)
 
-  # 计算 pairWiseMatrix
+  # calculate pairWiseMatrix
   pairWiseMatrix = getPairWiseMatrix(lastSegment, lastLabeled)
 
-  # 图割
+  # Graph-cut
   result_graph = cut_from_graph(binaryCostMatrix, unaryCostMatrix.reshape(-1, lastNumber), pairWiseMatrix, algorithm="swap")
   nextLabeled = result_graph.reshape(nextOriginal.shape)
   nextSegment = getEdgesFromLabel(nextLabeled)
 
-  # 查看中间结果
+  # Show the intermediate results
   # plt.subplot(231),plt.imshow(tempNextEdge,cmap="gray"),plt.title("nextEdges")
   # plt.subplot(232),plt.imshow(np.uint8(boundingRegion)),plt.title("boundingRegion")
   # #plt.subplot(232),plt.imshow(tempNextEdge,cmap="gray"),plt.title("nextEdges")
@@ -103,11 +102,11 @@ def propagationSegment(lastSegmentImageAddress, nextOriginalImageAddress, nextSe
   # plt.subplot(236),plt.imshow(nextSegment,cmap="gray"),plt.title("result")
   # plt.show()
 
-  # 导出图像
+  # Export image
   try:
       cv.imwrite(nextSegmentAddress, nextSegment)
   except (cv.error, Exception):
-      return "图片保存错误"
+      return "Picture is saved incorrectly"
   return nextSegment
 
 

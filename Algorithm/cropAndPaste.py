@@ -2,25 +2,24 @@ import os
 from Algorithm.propagation import propagationSegment
 from PIL import Image
 
-# 图像的裁剪和拼接
-# 每一张图像首先裁剪成200*200大小的图像，分别进行图割，最后将分割后的图像重新拼接
-# 裁剪顺序为先横向再纵向
-# tmp 裁剪图片暂存地址
+# Image cropping and stitching
+# Each image is first cropped into (sizeX, sizeY) image, then each image is segmented by graph-cut. Finally, the segmented image is re-stitched.
+# The cropping order is horizontal first and then vertical
+# tmp Temporary address of intermediate results
 
-# 裁剪
+# cropping
 def tailor(sizeX, sizeY, lastAddress, nextAddress, saveAddress, region = 10):
     image_last = Image.open(lastAddress)
     image_next = Image.open(nextAddress)
 
     if image_last.size != image_next.size:
-        return "上一层图像和本层图像维度不一样，错误"
+        return "Error! The image of the previous layer and the image of the layer is different in dimension."
 
     (w_image, h_image) = image_last.size
 
     row = int(h_image/sizeY)
     col = int(w_image/sizeX)
 
-    # 裁剪成200*200的图片
     n = 0
     for i in range(row):
         for j in range(col):
@@ -56,15 +55,15 @@ def tailor(sizeX, sizeY, lastAddress, nextAddress, saveAddress, region = 10):
                 roi_last.save(destination_last)
                 roi_next.save(destination_next)
             except:
-                return  "图片保存错误"
+                return "Picture is saved incorrectly"
     return "success"
 
-# 获取裁剪图片（以行-列名称保存）的最大行数和列数
+# Get the maximum number of rows and columns for a cropped picture (saved with row-column names)
 def getXAndY(pieceAddress):
     imgList = os.listdir(pieceAddress)
     tmpList = []
-    tmpX = 0    # 行
-    tmpY = 0    # 列
+    tmpX = 0    # row
+    tmpY = 0    # column
     for img in imgList:
         tmpList.append(img.replace('result', '').replace('last', '').replace('next', '').replace('.tif', '').split('-'))
     for size in tmpList:
@@ -74,13 +73,12 @@ def getXAndY(pieceAddress):
             tmpY = int(size[1])
     return [tmpX, tmpY]
 
-# 拼接
+# stitching
 def stitch(sizeX, sizeY, pieceAddress, saveRoad, region = 10):
-    # 拼接图片
     tmpX = getXAndY(pieceAddress)[0]
     tmpY = getXAndY(pieceAddress)[1]
-    resultWidth = sizeX*(tmpY+1)    # 宽
-    resultHeight = sizeY*(tmpX+1)   # 高
+    resultWidth = sizeX*(tmpY+1)    # width
+    resultHeight = sizeY*(tmpX+1)   # height
     result = Image.new("RGB", (resultWidth, resultHeight))
     for i in range(tmpX+1):
         for j in range(tmpY+1):
@@ -102,35 +100,24 @@ def stitch(sizeX, sizeY, pieceAddress, saveRoad, region = 10):
     result.save(saveRoad)
     return result
 
-'''
-图像分割，包含图像裁剪、图割、去毛刺和拼接一系列操作
-sizeX  裁剪图片宽
-sizeY  裁剪图片高
-lastLabeled  上一层已分割图像地址
-nextOriginal  本层原始图像地址
-nextSegment  本层分割结果保存地址
-finLength  去除毛刺阈值,默认为8
-boundingLength  默认16，边界区域大小
-infiniteCost   默认100，指无穷大
-'''
+
 def segment(sizeX, sizeY, lastLabeled, nextOriginal, nextSegment, algorithm = "ffc", boxLength = 18, boundingLength = 18, KCost = 3):
     """
-    功能：Fast-FineCut边界提取算法主函数，包含图像裁剪、传播分割、拼接一系列操作
-        输入：sizeX  裁剪图片宽，推荐值200
-             sizeY  裁剪图片高，推荐值200
-             lastLabeled  上一层已分割图像地址
-             nextOriginal  本层原始图像地址
-             nextSegment  本层分割结果保存地址
-             algorithm  算法类别 Fast-FineCut -- "ffc"  Waggoner -- "wag"
-             boxLength  重叠区域，默认与BoundingLength相同
-             boundingLength 边界区域长度，默认18
-             infiniteCost   默认100，指无穷大
-             KCost 传播分割中二元项参数，默认为3
-        输出: result：分割结果，需要注意的是结果由Image打开，并非opencv打开
-              bounndingRegion：属于该region像素值为255，不属于为0（可选）
+    Function：The main function of the Fast-FineCut boundary detection algorithm, including image cropping, propagation segmentation, stitching and so on
+        Input：sizeX: the width of the crop picture, recommended value 200
+             sizeY: the height of the crop picture, recommended value 200
+             lastLabeled: segmentation result of last image
+             nextOriginal: this layer's original image
+             nextSegment: storage address of this layer's segmentation result
+             algorithm: Algorithm category Fast-FineCut -- "ffc"  Waggoner -- "wag"
+             boxLength: Overlap area, same as BoundingLength by default
+             boundingLength: the length of bounding region, default 18
+             infiniteCost: Default 100, refers to infinity
+             KCost: K value of binary term in propagation segmentation, default 3
+        Output: result：Segmentation result, it should be noted that the result is opened by Image, not opencv
     """
 
-    # 裁剪图片暂存地址, 默认位于项目所在目录
+    # Temporary address of cropping picture, default in the directory where this project located
     img_tailor = os.path.join(os.getcwd(), 'tmp')
     if not os.path.exists(img_tailor):
         os.mkdir(img_tailor)
@@ -140,7 +127,6 @@ def segment(sizeX, sizeY, lastLabeled, nextOriginal, nextSegment, algorithm = "f
         [tmpX, tmpY] = getXAndY(img_tailor)
         for i in range(tmpX+1):
             for j in range(tmpY+1):
-                print("segment >>> ", i, "---", j)
                 lastSegmentImageAddress = os.path.join(img_tailor, "last"+str(i)+"-"+str(j)+'.tif')
                 nextOriginalImageAddress = os.path.join(img_tailor, "next"+str(i)+"-"+str(j)+'.tif')
                 nextSegmentAddress = os.path.join(img_tailor, "result"+str(i)+"-"+str(j)+'.tif')
@@ -148,4 +134,4 @@ def segment(sizeX, sizeY, lastLabeled, nextOriginal, nextSegment, algorithm = "f
         result = stitch(sizeX, sizeY, img_tailor, nextSegment, boxLength)
         return result
     else:
-        return "图像地址错误"
+        return "Image address error"
