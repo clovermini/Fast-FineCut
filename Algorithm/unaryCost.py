@@ -4,7 +4,7 @@
 #       2. provide getboundingRegion function
 # Writer：Boyuan Ma，Time：2017-2-24
 import numpy as np
-from .propagationLabel import getNumberFromLabel, getEdgesFromLabel, getRGBLabel
+from .propagationLabel import getNumberFromLabel, getEdgesFromLabel
 import matplotlib.pyplot as plt
 import cv2 as cv
 

@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-from Algorithm.propagationLabel import getEdgesFromLabel,evaluateMeritForEdge
+from Algorithm.propagationLabel import getEdgesFromLabel, evaluateMeritForEdge
 from skimage.measure import label
 import matplotlib.pyplot as plt
 from skimage import feature,morphology

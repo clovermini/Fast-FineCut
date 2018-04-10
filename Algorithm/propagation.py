@@ -5,7 +5,7 @@ from .unaryCost import getUnaryCost
 from .binaryCost import getBinaryCostFromUnary,getBinaryCostByWaggoner
 from .binaryCost import addComparation
 from .pairWise import getPairWiseMatrix
-from .propagationLabel import reviseLabel,getEdgesFromLabel,denoiseByArea
+from .propagationLabel import reviseLabel, getEdgesFromLabel, denoiseByArea
 
 from skimage import morphology
 from skimage.measure import label
@@ -70,7 +70,7 @@ def propagationSegment(lastSegmentImageAddress, nextOriginalImageAddress, nextSe
   unaryCostMatrix, boundingRegion = getUnaryCost(lastLabeled, lastSegment, return_boundingRegion=True, morphKernelNum=boundingLength, infiniteCost=infiniteCost)
 
   # Calculate the edgeImage required for the binary item
-  blurredGaussian = cv.GaussianBlur(nextOriginal, (3, 3), 0)         # 高斯滤波
+  blurredGaussian = cv.GaussianBlur(nextOriginal, (3, 3), 0)
   imgThreshMean = cv.adaptiveThreshold(blurredGaussian, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 5, 4)
   imgThreshMean = denoiseByArea(imgThreshMean, 300, neighbors=8)
   tempNextEdge = morphology.skeletonize(imgThreshMean / 255) * 255

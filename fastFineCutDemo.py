@@ -14,7 +14,7 @@ if __name__ == "__main__":
     ROOT_DIR = os.path.join(os.getcwd(), "images")
     lastSegmentImageAddress = os.path.join(ROOT_DIR, "GroundTruth")   # The address of segment result of last image
     nextOriginalImageAddress = os.path.join(ROOT_DIR, "Original")     # The address of the original image to be segmented in this layer
-    nextSegmentAddress = os.path.join(ROOT_DIR, "Results/Waggoner")   # The storage address of segmentation results
+    nextSegmentAddress = os.path.join(ROOT_DIR, "Results/FastFineCut")   # The storage address of segmentation results
     index = ['001', '002', '003', '004', '005']  # List of image_ids
 
     T = 0
@@ -67,10 +67,10 @@ if __name__ == "__main__":
 
         cv2.imwrite(next_Segment, segmentResult_fc)
         F_test = evaluateMeritForEdge(segmentResult, nLab_edge_fc)
-        print("name = " + index[i] + " , F = " + str(F_test) + ' , time = ' + str(end_time - start_time))
+        print("name = " + index[i] + " , Figure of merit = " + str(F_test) + ' , time = ' + str(end_time - start_time) + "sec")
 
         F += F_test
         T += (end_time - start_time)
 
-    print("average F = " + str(F / Length) + " , average T = " + str(T / Length))
+    print("average Figure of merit = " + str(F / Length) + " , average Time = " + str(T / Length) + "sec")
 

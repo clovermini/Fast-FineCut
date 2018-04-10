@@ -4,7 +4,7 @@
 # Writer：Boyuan ma. Time：2017-2-24
 import numpy as np
 import cv2 as cv
-from .propagationLabel import getRGBLabel, getNumberFromLabel
+from .propagationLabel import getNumberFromLabel
 from skimage.future import graph
 
 
