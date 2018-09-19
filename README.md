@@ -4,18 +4,17 @@ This is an implementation of Fast-FineCut algorithm in Python 3, which is a boun
 
 If you use it successfully for your research please be so kind to cite our work:
 
-    @article{article,
-    author = {Ma, Boyuan and Ban, Xiaojuan and Su, Ya and Liu, Chuni and Wang, Hao and Xue, Weihua and Zhi, Yonghong and Wu, Di},
-    year = {2018},
-    month = {09},
-    pages = {},
-    title = {Fast-FineCut: Grain boundary detection in microscopic images considering 3D information},
-    booktitle = {Micron}
+    @article{ma2018fast,
+      title={Fast-FineCut: Grain boundary detection in microscopic images considering 3D information},
+      author={Ma, Boyuan and Ban, Xiaojuan and Su, Ya and Liu, Chuni and Wang, Hao and Xue, Weihua and Zhi, Yonghong and Wu, Di},
+      journal={Micron},
+      year={2018},
+      publisher={Elsevier}
     }
 
 or
 
-    Ma B, Ban X, Su Y, Liu C, Wang H, Xue W. "Fast-FineCut : Boundary detection in microscopic images considering 3D information", DOI: 10.1016/j.micron.2018.09.002
+    Ma B, Ban X, Su Y, et al. Fast-FineCut: Grain boundary detection in microscopic images considering 3D information[J]. Micron, 2018.
 
 ## Introduction
 The inner structure of a material is called microstructure. It stores the genesis of a material and determines all its physical and chemical properties. However, it is still a big challenge to detect key information in microscopic images fastly
